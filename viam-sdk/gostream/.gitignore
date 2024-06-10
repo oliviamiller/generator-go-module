@@ -1,0 +1,2 @@
+# Keep FFmpeg static libraries 
+!**/ffmpeg/**/*.a
