@@ -6,7 +6,7 @@ const { spawnSync } = require('child_process');
 const { exit } = require('process');
 
 module.exports = class extends Generator {
-  async prompting() {
+  prompting() {
     console.log(
       '\n'
         + '  *** viam module generator ***  \n'
@@ -23,7 +23,7 @@ module.exports = class extends Generator {
       },
     ];
 
-    await this.prompt(numModel).then((props) => {
+    this.prompt(numModel).then((props) => {
       this.numModels = props.numModels;
     });
 
@@ -61,7 +61,6 @@ module.exports = class extends Generator {
     new Promise((r) => {
       doPrompts.call(this, r);
     }).then(() => {
-      console.log(this.apis);
       cb();
     });
   }
