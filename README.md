@@ -1,7 +1,7 @@
 # generator-go-module
 
 Autogenerate the boilerplate for a viam go module using the
-[Yeoman] (https://github.com/yeoman/yo) scaffolding library.
+[Yeoman](https://github.com/yeoman/yo) scaffolding library.
 
 
 # Usage

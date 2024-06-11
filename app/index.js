@@ -68,52 +68,72 @@ module.exports = class extends Generator {
   writing() {
     console.log('\nGenerating modules');
 
-    let j = 0;
+    let i = 0;
 
-    // get stuff from the viam sdk
-    while (j < this.apis.length) {
-      const clientPath = path.join(__dirname, '/../viam-sdk/components', this.apis[j], '/client.go');
+    // Get function stubs from the go SDK.
+    while (i < this.apis.length) {
+            const clientPath = path.join(__dirname, '/../viam-sdk/components', this.apis[i], '/client.go');
       const clientCode = this.fs.read(clientPath);
 
       let imports = clientCode.substring(clientCode.indexOf('(\n') + 1, clientCode.indexOf(')'));
 
-      // get rid of the unneeded imports
+      // get rid of the unneeded imports.
+      // there may be others that are unneccessary for the module that will get imported.
       imports = imports.replace('"go.viam.com/rdk/protoutils"\n', '');
+      imports = imports.replace('rprotoutils "go.viam.com/rdk/protoutils"\n', '')
+      imports = imports.replace('rprotoutils', '')
+      imports = imports.replace('"go.viam.com/utils/protoutils"\n', '')
       imports = imports.replace('commonpb "go.viam.com/api/common/v1"\n', '');
-      imports = imports.replace(`pb "go.viam.com/api/component/${this.apis[j]}/v1"\n`, '');
+      imports = imports.replace(`pb "go.viam.com/api/component/${this.apis[i]}/v1"\n`, '');
       imports = imports.replace('"google.golang.org/protobuf/types/known/structpb"\n', '');
       imports = imports.replace('"go.viam.com/utils/rpc"\n', '');
 
-      // get only the API functions
-      const functions = clientCode.split('func').slice(2);
-      let i = 0;
-      while (i < functions.length) {
+      // get only the client functions
+      const functions = clientCode.split('func (c *client)').slice(1);
+      let j = 0;
+
+      while (j < functions.length) {
         // replace client with struct name
-        functions[i] = functions[i].replace('(c *client)', `func (s *${this.moduleName}${this.models[j]})`);
+        functions[j] = `func (s *${this.moduleName}${this.models[i]})` + functions[j];
 
         // remove code inside of function
-        const inside = functions[i].substring(functions[i].indexOf('{\n') + 1, functions[i]?.lastIndexOf('}'));
-        functions[i] = functions[i].replace(inside, '\n\n');
-        i += 1;
+        const inside = functions[j].substring(functions[j].indexOf('{\n') + 1, functions[j]?.lastIndexOf('}'));
+        functions[j] = functions[j].replace(inside, '\n\n');
+
+        // Theres a bug where if the function returns a struct in the component package, it needs the package name to import it
+        // Properties is a common one but there are others that one may need to add manually.
+        const index =  functions[j].lastIndexOf('Properties');
+        if (index != -1) {
+          functions[j] = functions[j].slice(0, index) + this.apis[i] + '.' + functions[j].slice(index);
+        }
+        j+=1
+      }
+
+      // Get apiname with a capital letter to use in the template.
+      let apiNameUppercase = this.apis[i][0].toUpperCase() + this.apis[i].slice(1);
+      // powersensor and movementsensor need two letters capatilized.
+      const index =  apiNameUppercase.indexOf('sensor');
+      if (index != -1) {
+          apiNameUppercase = apiNameUppercase.slice(0, index) + apiNameUppercase[index].toUpperCase() + apiNameUppercase.slice(index + 1);
       }
 
       const tmplContext = {
         moduleName: this.moduleName,
         nameSpace: this.nameSpace,
-        apiName: this.apis[j],
-        modelName: this.models[j],
-        apiNameUppercase: this.apis[j].charAt(0).toUpperCase() + this.apis[j].slice(1),
+        apiName: this.apis[i],
+        modelName: this.models[i],
+        apiNameUppercase: apiNameUppercase,
         funcs: functions.join(''),
         moreImports: imports,
       };
 
       this.fs.copyTpl(
         this.templatePath('_module.go'),
-        this.destinationPath(`${this.models[j]}/${this.models[j]}.go`),
+        this.destinationPath(`${this.models[i]}/${this.models[i]}.go`),
         tmplContext,
       );
 
-      j += 1;
+      i += 1;
     }
 
     const mainContext = {

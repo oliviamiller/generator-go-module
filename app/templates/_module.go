@@ -2,6 +2,7 @@ package <%=modelName%>
 
 import (
     "go.viam.com/rdk/components/<%=apiName%>"
+	"go.viam.com/rdk/resource"
 	<%- moreImports %>
 )
 
@@ -85,3 +86,8 @@ func (s *<%=moduleName%><%=modelName%>) Reconfigure(ctx context.Context, deps re
 }
 
 <%=funcs%>
+
+func (s *<%=moduleName%><%=modelName%>) Close() error {
+	// put close code here
+	return nil
+}

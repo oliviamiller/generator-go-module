@@ -2,9 +2,12 @@ package main
 
 import (
 	"context"
+	"go.viam.com/rdk/logging"
+	"go.viam.com/rdk/module"
+	"go.viam.com/utils"
 	<% let i = 0 %>
 	<% for (api of apis) { %>
-		"<%=moduleName%>/<%=models[i]%>"
+		<%=models[i]%> "<%=moduleName%>/<%=models[i]%>"
 		"go.viam.com/rdk/components/<%=api%>"
 		<% i += 1 %>
    <% } %>
@@ -22,7 +25,7 @@ func mainWithArgs(ctx context.Context, args []string, logger logging.Logger) err
 
 	<% let j = 0 %>
 	<% for (model of models) { %>
-		if err = <%= moduleName%>.AddModelFromRegistry(ctx, <%=apis[j]%>.API, <%=moduleName%>.Model); err != nil {
+		if err = <%= moduleName%>.AddModelFromRegistry(ctx, <%=apis[j]%>.API, <%=model%>.Model); err != nil {
 			return err
 		}
 		<% j += 1 %>
