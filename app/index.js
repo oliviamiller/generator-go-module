@@ -78,7 +78,7 @@ module.exports = class extends Generator {
 
       let imports = clientCode.substring(clientCode.indexOf('(\n') + 1, clientCode.indexOf(')'));
 
-      // get rid of the uneeded imports
+      // get rid of the unneeded imports
       imports = imports.replace('"go.viam.com/rdk/protoutils"\n', '');
       imports = imports.replace('commonpb "go.viam.com/api/common/v1"\n', '');
       imports = imports.replace(`pb "go.viam.com/api/component/${this.apis[j]}/v1"\n`, '');

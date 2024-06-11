@@ -1,6 +1,6 @@
 {
   "name": "generator-viam-go-module",
-  "version": "0.1.5",
+  "version": "0.0.1",
   "description": "Generate a go viam module",
   "files": [
     "app"
@@ -11,13 +11,5 @@
   },
   "dependencies": {
     "yeoman-generator": "^3.2.0"
-  },
-  "engines": {
-    "node": ">=6.9.0"
-  },
-  "devDependencies": {
-    "eslint": "^8.35.0",
-    "eslint-config-airbnb-base": "^15.0.0",
-    "eslint-plugin-import": "^2.27.5"
   }
 }

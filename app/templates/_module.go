@@ -1,4 +1,4 @@
-package <%=moduleName%>
+package <%=modelName%>
 
 import (
     "go.viam.com/rdk/components/<%=apiName%>"

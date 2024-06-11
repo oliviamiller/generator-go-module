@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	<% let i = 0 %>
 	<% for (api of apis) { %>
 		"<%=moduleName%>/<%=models[i]%>"
