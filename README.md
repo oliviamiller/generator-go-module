@@ -29,13 +29,6 @@ Once the module is created, run
 ``` bash
 go mod tidy
 ```
-
 Then, add defintions for the function stubs prior to building the module.
 
-Note that Board and Camera modules are currently unsupported.
-
-
-
-
-
-
+Note that Board, Input, and Camera modules are currently unsupported.
