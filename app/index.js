@@ -118,8 +118,13 @@ module.exports = class extends Generator {
 
         // Theres a bug where if the function returns a struct in the component package, it needs the package name to import it
         // Properties is a common one but there are others that one may need to add manually.
-        const index =  functions[j].lastIndexOf('Properties');
+        let index =  functions[j].lastIndexOf('Properties');
         if (index != -1) {
+          functions[j] = functions[j].slice(0, index) + this.apis[i] + '.' + functions[j].slice(index);
+        }
+        index =  functions[j].lastIndexOf('Accuracy');
+        if (index != -1) {
+          console.log('here')
           functions[j] = functions[j].slice(0, index) + this.apis[i] + '.' + functions[j].slice(index);
         }
         j+=1
