@@ -32,7 +32,7 @@ module.exports = class extends Generator {
       {
         type: 'input',
         name: 'triplet',
-        message: 'Enter the resource model triplet (in the form namespace:repo-name:model-name):',
+        message: 'Enter the resource model triplet (in the form namespace:family:model-name):',
       },
       {
         type: 'input',
@@ -43,6 +43,7 @@ module.exports = class extends Generator {
 
     this.models = [];
     this.apis = [];
+    this.families = [];
 
     async function doPrompts(resolve, reject) {
       await this.prompt(prompts).then((props) => {
@@ -52,7 +53,7 @@ module.exports = class extends Generator {
         else {
           const names = props.triplet.split(':');
           this.nameSpace = names?.[0];
-          this.moduleName = names?.[1];
+          this.families.push(names?.[1]);
           this.models.push(names?.[2]);
           this.apis.push(props.apiName);
         }
@@ -110,7 +111,7 @@ module.exports = class extends Generator {
 
       while (j < functions.length) {
         // replace client with struct name
-        functions[j] = `func (s *${this.moduleName}${this.models[i]})` + functions[j];
+        functions[j] = `func (s *${this.families[i]}${this.models[i]})` + functions[j];
 
         // remove code inside of function
         const inside = functions[j].substring(functions[j].indexOf('{\n') + 1, functions[j]?.lastIndexOf('}'));
@@ -124,7 +125,6 @@ module.exports = class extends Generator {
         }
         index =  functions[j].lastIndexOf('Accuracy');
         if (index != -1) {
-          console.log('here')
           functions[j] = functions[j].slice(0, index) + this.apis[i] + '.' + functions[j].slice(index);
         }
         j+=1
@@ -140,7 +140,7 @@ module.exports = class extends Generator {
       }
 
       const tmplContext = {
-        moduleName: this.moduleName,
+        moduleName: this.families[i],
         nameSpace: this.nameSpace,
         apiName: this.apis[i],
         modelName: this.models[i],
