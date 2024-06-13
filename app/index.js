@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
 const Generator = require('yeoman-generator');
 const path = require('node:path');
+const fs = require('fs');
 
 const { spawnSync } = require('child_process');
 const { exit } = require('process');
@@ -36,43 +37,58 @@ module.exports = class extends Generator {
       {
         type: 'input',
         name: 'apiName',
-        message: 'which API does the module implement?',
+        message: 'Which API does this model implement?',
       },
     ];
 
     this.models = [];
     this.apis = [];
 
-    async function doPrompts(resolve) {
+    async function doPrompts(resolve, reject) {
       await this.prompt(prompts).then((props) => {
-        const names = props.triplet.split(':');
-        this.nameSpace = names?.[0];
-        this.moduleName = names?.[1];
-        this.models.push(names?.[2]);
-        this.apis.push(props.apiName);
+        if (props.apiName == 'board' ||  props.apiName == 'camera') {
+          reject(props.apiName + ' is not supported yet');
+        }
+        else {
+          const names = props.triplet.split(':');
+          this.nameSpace = names?.[0];
+          this.moduleName = names?.[1];
+          this.models.push(names?.[2]);
+          this.apis.push(props.apiName);
+        }
       });
       this.numModels -= 1;
       if (this.numModels > 0) {
-        doPrompts.call(this, resolve);
+        doPrompts.call(this, resolve, reject);
       } else {
         resolve();
       }
     }
-    new Promise((r) => {
-      doPrompts.call(this, r);
+    new Promise((resolve, reject) => {
+      doPrompts.call(this, resolve, reject);
     }).then(() => {
       cb();
+    },
+    (error) => {
+      console.log(error);
     });
   }
 
   writing() {
     console.log('\nGenerating modules');
-
     let i = 0;
 
     // Get function stubs from the go SDK.
     while (i < this.apis.length) {
-            const clientPath = path.join(__dirname, '/../viam-sdk/components', this.apis[i], '/client.go');
+      let clientPath = '';
+      this.resourceType = 'Component';
+      clientPath = path.join(__dirname, '/../viam-sdk/components', this.apis[i], '/client.go');
+
+      // if component doesn't exist check if its a service.
+      if (!fs.existsSync(clientPath)) {
+            clientPath = path.join(__dirname, '/../viam-sdk/services', this.apis[i], '/client.go');
+            this.resourceType = 'Service';
+        }
       const clientCode = this.fs.read(clientPath);
 
       let imports = clientCode.substring(clientCode.indexOf('(\n') + 1, clientCode.indexOf(')'));
@@ -109,12 +125,13 @@ module.exports = class extends Generator {
         j+=1
       }
 
-      // Get apiname with a capital letter to use in the template.
-      let apiNameUppercase = this.apis[i][0].toUpperCase() + this.apis[i].slice(1);
-      // powersensor and movementsensor need two letters capatilized.
-      const index =  apiNameUppercase.indexOf('sensor');
-      if (index != -1) {
-          apiNameUppercase = apiNameUppercase.slice(0, index) + apiNameUppercase[index].toUpperCase() + apiNameUppercase.slice(index + 1);
+      let apiNameUppercase = getApiNameUpperCase(this.apis[i])
+
+      let objName = ''
+      if (this.resourceType == 'Service') {
+        objName = 'Service'
+      } else {
+         objName = apiNameUppercase
       }
 
       const tmplContext = {
@@ -125,6 +142,9 @@ module.exports = class extends Generator {
         apiNameUppercase: apiNameUppercase,
         funcs: functions.join(''),
         moreImports: imports,
+        objName: objName,
+        resourceType: this.resourceType,
+        resourceTypeLower: this.resourceType.toLowerCase(),
       };
 
       this.fs.copyTpl(
@@ -141,6 +161,7 @@ module.exports = class extends Generator {
       nameSpace: this.nameSpace,
       apis: this.apis,
       models: this.models,
+      resourceTypeLower: this.resourceType.toLowerCase(),
     };
 
     this.fs.copyTpl(
@@ -171,3 +192,27 @@ module.exports = class extends Generator {
     );
   }
 };
+
+function capitalize(name, index) {
+  name = name.slice(0, index) +
+  name[index].toUpperCase() +
+  name.slice(index + 1);
+  return name;
+}
+
+function getApiNameUpperCase(name) {
+   // Get apiname with a capital letter to use in the template.
+   name = name[0].toUpperCase() + name.slice(1);
+
+   // posetracker, powersensor and movementsensor need two letters capatilized.
+   index = name.indexOf('sensor');
+   if (index != -1) {
+       name = capitalize(name, index);
+   }
+   index = name.indexOf('tracker');
+   if (index != -1) {
+      name = capitalize(name, index);
+   }
+   return name
+}
+

@@ -8,7 +8,7 @@ import (
 	<% let i = 0 %>
 	<% for (api of apis) { %>
 		<%=models[i]%> "<%=moduleName%>/<%=models[i]%>"
-		"go.viam.com/rdk/components/<%=api%>"
+		"go.viam.com/rdk/<%=resourceTypeLower%>s/<%=api%>"
 		<% i += 1 %>
    <% } %>
 )
@@ -22,7 +22,6 @@ func mainWithArgs(ctx context.Context, args []string, logger logging.Logger) err
 	if err != nil {
 		return err
 	}
-
 	<% let j = 0 %>
 	<% for (model of models) { %>
 		if err = <%= moduleName%>.AddModelFromRegistry(ctx, <%=apis[j]%>.API, <%=model%>.Model); err != nil {

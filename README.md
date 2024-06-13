@@ -25,6 +25,15 @@ yo viam-go-module
 ```
 and follow the prompts to create a module.
 
+Once the module is created, run
+``` bash
+go mod tidy
+```
+
+Then, add defintions for the function stubs prior to building the module.
+
+Note that Board and Camera modules are currently unsupported.
+
 
 
 
