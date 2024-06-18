@@ -7,8 +7,10 @@
   ],
   "keywords": ["yeoman-generator"],
   "main": "app/index.js",
+
   "scripts": {
-  },
+      "preinstall": "git init && git submodule add -f https://github.com/viamrobotics/rdk.git viam-sdk"
+    },
   "dependencies": {
     "yeoman-generator": "^3.2.0"
   }
