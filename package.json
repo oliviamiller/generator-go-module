@@ -1,16 +1,17 @@
 {
   "name": "generator-viam-go-module",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Generate a go viam module",
   "files": [
     "app"
   ],
-  "keywords": ["yeoman-generator"],
+  "keywords": [
+    "yeoman-generator"
+  ],
   "main": "app/index.js",
-
   "scripts": {
-      "preinstall": "git init && git submodule add -f https://github.com/viamrobotics/rdk.git viam-sdk"
-    },
+    "preinstall": "git init && git submodule add -f https://github.com/viamrobotics/rdk.git viam-sdk"
+  },
   "dependencies": {
     "yeoman-generator": "^3.2.0"
   }
