@@ -81,6 +81,7 @@ module.exports = class extends Generator {
 
     // Get function stubs from the go SDK.
     while (i < this.apis.length) {
+      this.moduleName = this.families[i]
       let clientPath = '';
       this.resourceType = 'Component';
       clientPath = path.join(__dirname, '/../viam-sdk/components', this.apis[i], '/client.go');
