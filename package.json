@@ -1,6 +1,6 @@
 {
   "name": "generator-viam-go-module",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Generate a go viam module",
   "files": [
     "app"
