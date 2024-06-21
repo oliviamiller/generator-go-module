@@ -5,7 +5,7 @@ import (
 	<%- moreImports %>
 )
 
-var Model = resource.NewModel("<%=nameSpace%>", "<%=moduleName%>", " <%=modelName%>")
+var Model = resource.NewModel("<%=nameSpace%>", "<%=moduleName%>", "<%=modelName%>")
 
 func init() {
 	resource.Register<%=resourceType%>(<%=apiName%>.API, Model,
